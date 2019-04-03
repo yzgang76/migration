@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-4.0.xsd
+			http://www.springframework.org/schema/tx
+			http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+			http://www.springframework.org/schema/task
+			http://www.springframework.org/schema/task/spring-task-4.0.xsd
+			http://www.springframework.org/schema/aop  
+            http://www.springframework.org/schema/aop/spring-aop-4.0.xsd"
+
+	default-autowire="byName" default-lazy-init="true">
+
+	<context:component-scan
+		base-package="com.hp.ngoss.owd.config.xml, com.hp.uoc.cm.xml,com.hp.uoc.cm.um.service,com.hp.uoc.cm.um.jobs, com.hp.ngoss.owd.config.events,
+		com.hp.uoc.cm.temip.service,com.hp.uoc.cm.temip.advices,com.hp.uoc.cm.um.advices, com.hp.ngoss.owd.config.actor" />
+		
+	<aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true"/> 
+
+	<bean id="remoteServiceProvider" class="com.hp.ngoss.uoc.utils.rmi.impl.RMIServiceProvider"
+		init-method="init">
+		<property name="scanPackage"
+			value="com.hp.ngoss.owd.config.xml, com.hp.uoc.cm.xml,com.hp.uoc.cm.um.service, com.hp.uoc.cm.um.jobs, com.hp.ngoss.owd.config.events,com.hp.uoc.cm.temip.service" />
+	</bean>
+    
+    <bean id="dataSource" class="com.hp.uoc.cm.um.util.CmDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="org.h2.Driver" />
+		<property name="url" value="jdbc:h2:tcp://localhost:9192/${OSSM_DATA}/db/uoc_umm_md5;ifexists=true" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" >
+			<array>
+				<value>classpath:com/hp/uoc/cm/um/service/*.xml</value>
+				<value>classpath:com/hp/uoc/cm/temip/mapper/*.xml</value>
+			</array>
+		</property>
+		<property name="typeAliasesPackage" value="com.hp.ngoss.owd.intf.auth;com.hp.uoc.temip.config" />
+	</bean>
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.hp.ngoss.owd.intf.auth,com.hp.uoc.cm.um.service.intf,com.hp.uoc.cm.um.dao,com.hp.uoc.cm.temip.dao" />
+	</bean>
+
+	<!-- enable annotation config -->  
+    <context:annotation-config />  
+  
+    <!-- enable annotation driven-->  
+    <tx:annotation-driven />  
+  
+    <!-- transaction manager-->  
+    <bean id="transactionManager"  
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="dataSource" />  
+    </bean>  
+	
+	<bean id="springBeanUtil" class="com.hp.ngoss.uoc.utils.beans.BeanUtils" lazy-init="false"/>
+
+</beans>

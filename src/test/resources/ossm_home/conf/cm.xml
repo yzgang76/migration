@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cm>
+	<scan_package>com.hp.ngoss.owd.config.xml</scan_package>
+	<rmi_hostname>localhost</rmi_hostname>
+	<rmi_port>1099</rmi_port>
+</cm>

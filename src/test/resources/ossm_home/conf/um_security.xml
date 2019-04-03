@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<um_security>
+	<!--value: on or off, ignore case -->
+	<must_reset_password>off</must_reset_password>
+	<!--value: on or off, ignore case -->
+	<check_password_criteria>off</check_password_criteria>
+	<!--value: on or off, ignore case -->
+    <lock_user_account>off</lock_user_account>
+	<!--value: on or off, ignore case -->
+    <password_expired>off</password_expired>
+	<!--unit:minute ,0 means don't inactive user-->
+    <inactive_period_time>0</inactive_period_time>
+	<!--value: PBKDF2 or MD5, ignore case -->
+	<password_encryption_method>MD5</password_encryption_method>
+</um_security>

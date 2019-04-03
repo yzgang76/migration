@@ -1,0 +1,17 @@
+<Dictionary>
+   <!-- blow basic parameters change no need to restart adapter  -->
+	<enable>false</enable> <!-- enable job or disable job  -->
+	<driverClassName>com.mysql.jdbc.Driver</driverClassName> <!-- db driver class  -->
+	<url>jdbc:mysql://16.17.100.97:3306/temipdict</url> <!-- db connection url  localhost-->
+	<dbname>temipdict</dbname> <!-- db name -->
+	<username>temip</username> <!-- db user name -->
+	<password>123456</password> <!-- db password -->
+	<sqlBatchSize>50000</sqlBatchSize> <!-- insert db table SQL throughput setting, please refer to the  mysql reference and server  memory-->
+	<dictionaryBatchSize>1000000</dictionaryBatchSize><!-- java jvm instance pool throughput setting,please refer to server memory and java jvm setting,here default 1000000 is need 12g memory-->
+	<xmlFilePath>C:/bigdata/logs/tmp</xmlFilePath>
+	<intervalInSeconds>2</intervalInSeconds> <!--optional, each circle running interval time  -->
+	<!-- blow parameters change need restart adapter -->
+	<runCircle>1</runCircle>   <!-- optional, only value is 1, it will work and the job will only run once -->
+	<cron>0 0/1 * * * ?</cron>   <!-- job running interval time please refer to quartz cron expression reference  -->
+	
+</Dictionary>

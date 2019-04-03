@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export>
+   <clean_file_per_minutes>1440</clean_file_per_minutes><!--default is 1440 ,minutes for 1 day -->
+</export>

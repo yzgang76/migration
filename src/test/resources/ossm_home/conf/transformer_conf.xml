@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformers>
+	<!--
+	<transformer>
+		<dimensionname>temip_alarm</dimensionname>
+		<before>true</before>
+		<type>insert</type>
+		<classes>com.test.BeforeInsertHandler1;com.test.BeforeInsertHandler2</classes>
+	</transformer>
+	-->
+</transformers>

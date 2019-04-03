@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db>
+	<driver>com.mysql.jdbc.Driver</driver>
+    <url>jdbc:mysql://localhost:3306/ossmdb?autoReconnect=true&amp;autoReconnectForPools=true&amp;useunicode=true&amp;characterEncoding=utf8</url>
+    <usrname>ossm</usrname>
+    <password>123456</password>
+    <maxConnNumber>300</maxConnNumber>
+    <maxIdleNumber>30</maxIdleNumber>
+    <maxWait>30</maxWait>
+    <testSql>SELECT 1</testSql>
+    <default_field_length>256</default_field_length>
+    <dimensions>temip_alarm,temip_history_alarm</dimensions>
+    <dimension_string_ex>
+       <dimension name= "temip_alarm">
+          <extendstr>additional_text:4096</extendstr>
+       </dimension>
+       <dimension name= "temip_history_alarm">
+          <extendstr>additional_text:4096</extendstr>
+       </dimension>
+    </dimension_string_ex>
+</db>
