@@ -39,9 +39,9 @@ public class MigrationV256 {
     private static final String pathAKKAHost = "akka.remote.netty.tcp.hostname";
     private static final String pathAKKAPort = "akka.remote.netty.tcp.port";
 
-    private static final String fileListConf[] = {"selfmonitor", "wsrestservice", "cmglobal", "dcglobal", "selfmonitor_presenter",
+    private static final String[] fileListConf = {"selfmonitor", "wsrestservice", "cmglobal", "dcglobal", "selfmonitor_presenter",
             "sink", "receiverglobal", "receiverservice", "receiverconsole", "bulk_operation"};
-    private static final String fileListAdapter[] = {"/umb_temip/conf/umbadapter"};
+    private static final String[] fileListAdapter = {"/umb_temip/conf/umbadapter"};
 
     public static String OSSM_DATA = System.getenv("OSSM_DATA");
     public static String OSSM_HOME = System.getenv("OSSM_HOME");
@@ -100,7 +100,10 @@ public class MigrationV256 {
         try{
             File fOutput= new File(OSSM_DATA + "/conf/host_and_port.conf");
             if (!fOutput.exists()) {
-                fOutput.createNewFile();
+                boolean r=fOutput.createNewFile();
+                if(!r){
+                    System.out.println("Error: Failed to create file.");
+                }
             }
             FileWriter fileWritter = new FileWriter(fOutput, false);
             fileWritter.write("HOST_LOCAL={\n");
@@ -520,7 +523,7 @@ public class MigrationV256 {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         if(args.length==0){  //migrate all conf files
             System.out.println("Tools to migrate configuration files from v2.5.6 sp2 to v2.6 MR");
             if (null == OSSM_DATA) {  //check OSSM_DATA
