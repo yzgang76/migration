@@ -14,15 +14,15 @@ public class MigrationV256 {
     private static boolean isGlobalChanged = false;
     public static boolean isHA = false;  //public for UT
     private static String PROTOCOL = "http";
-    private static String TRUSTSTORE_FILE ="/ssl/exampletrust.jks";
+    private static String TRUSTSTORE_FILE = "/ssl/exampletrust.jks";
     private static String TRUSTSTORE_TYPE = "JKS";
     private static String TRUSTSTORE_PASS = "ossmtest";
-    private static boolean UOC_strictSSL=false;
-    private static String UOC_trustStoreFile ="";
+    private static boolean UOC_strictSSL = false;
+    private static String UOC_trustStoreFile = "";
     private static String UOC_trustStorePass = "";
     private static String UOC_trustStoreType = "";
     private static String HOST_LOCAL = "localhost";
-    private static String Present_HOST = "localost";
+    private static String Present_HOST = "localhost";
     private static String HOST_HA = "";
     private static int AKKA_SELF_MONITOR = 3713;
     private static int AKKA_REST_SERVICE = 4741;
@@ -40,12 +40,12 @@ public class MigrationV256 {
     private static int DC_TCP = 9292;
     private static int H2_CM_DB = 9192;
     private static int UOC_HTTP = 3000;
-    private static String UOC_PROTOCOL="http";
-    private static String UOC_HOST="localhost";
+    private static String UOC_PROTOCOL = "http";
+    private static String UOC_HOST = "localhost";
     private static int HA_AKKA_CM = 5556;
     private static int HA_UOC_HTTP = 3000;
-    private static String HA_UOC_HOST="";
-    private static String HA_UOC_PROTOCOL="http";
+    private static String HA_UOC_HOST = "";
+    private static String HA_UOC_PROTOCOL = "http";
     private static int HA_AKKA_BULK_OP = 5557;
 
     private static final String pathAKKAHost = "akka.remote.netty.tcp.hostname";
@@ -145,9 +145,9 @@ public class MigrationV256 {
 
             //HOST_PRESENTER
             fileWritter.write("HOST_PRESENTER={\n");
-            if(Present_HOST.equals(HOST_LOCAL)){
+            if (Present_HOST.equals(HOST_LOCAL)) {
                 fileWritter.write("\tHOST=${HOST_LOCAL.HOST}\n");
-            }else{
+            } else {
                 fileWritter.write("\tHOST=\"" + Present_HOST + "\"\n");
             }
             fileWritter.write("\tPROTOCOL=\"" + PROTOCOL + "\"\n");
@@ -166,9 +166,9 @@ public class MigrationV256 {
             //HOST_UOC
             fileWritter.write("HOST_UOC={\n");
             fileWritter.write("\tprotocol=\"" + UOC_PROTOCOL + "\"\n");
-            if(UOC_HOST.equals(HOST_LOCAL)){
+            if (UOC_HOST.equals(HOST_LOCAL)) {
                 fileWritter.write("\thost=${HOST_LOCAL.HOST}\n");
-            }else{
+            } else {
                 fileWritter.write("\thost=\"" + UOC_HOST + "\"\n");
             }
             fileWritter.write("\tport=${HOST_LOCAL.PORTS.UOC_HTTP}\n");
@@ -194,24 +194,24 @@ public class MigrationV256 {
                 fileWritter.write("\t}\n");
                 fileWritter.write("}\n");
                 fileWritter.write("\n");
+
                 fileWritter.write("HA={\n");
-
-
-                fileWritter.write("  cmHA {\n" +
-                        "       host = ${HOST_HA_REMOTE.HOST} //use the same hostname configured in the cmglobal.conf of the other server\n" +
-                        "       port = ${HOST_HA_REMOTE.PORTS.AKKA_CM}\n" +
-                        "     }\n" +
+                fileWritter.write("\tcmHA {\n" +
+                        "\t\thost = ${HOST_HA_REMOTE.HOST}\n" +
+                        "\t\tport = ${HOST_HA_REMOTE.PORTS.AKKA_CM}\n" +
+                        "\t}\n" +
                         "\n" +
-                        "    bulkHA {\n" +
-                        "       host = ${HOST_HA_REMOTE.HOST} //use the same hostname configured in the cmglobal.conf of the other server\n" +
-                        "       port = ${HOST_HA_REMOTE.PORTS.AKKA_BULK_OP}\n" +
-                        "     }\n" +
+                        "\tbulkHA {\n" +
+                        "\t\thost = ${HOST_HA_REMOTE.HOST}\n" +
+                        "\t\tport = ${HOST_HA_REMOTE.PORTS.AKKA_BULK_OP}\n" +
+                        "\t}\n" +
                         "\n" +
-                        "  UOC_REMOTE{\n" +
-                        "    protocol = \"http\"\n" +
-                        "    host = ${HOST_HA_REMOTE.HOST}\n" +
-                        "    port = ${HOST_HA_REMOTE.PORTS.UOC_HTTP}\n" +
-                        "  }");
+                        "\tUOC_REMOTE{\n" +
+                        "\t\tprotocol = \"http\"\n" +
+                        "\t\thost = ${HOST_HA_REMOTE.HOST}\n" +
+                        " \t\tport = ${HOST_HA_REMOTE.PORTS.UOC_HTTP}\n" +
+                        " \t}\n");
+                fileWritter.write("}\n");
             }
             fileWritter.flush();
             fileWritter.close();
@@ -387,27 +387,27 @@ public class MigrationV256 {
         final Config bulkOperation = ConfigFactory.load(confName + ext);
 //        System.out.println("xxxx="+bulkOperation.getString("slick-h2.db.properties.url"));
         pickupAkkaPort(bulkOperation, "AKKA_BULK_OP", confName);
-        H2_CM_DB=getIntConfigurationValue(confName, bulkOperation, "PORTS.H2_CM_DB", H2_CM_DB);
+        H2_CM_DB = getIntConfigurationValue(confName, bulkOperation, "PORTS.H2_CM_DB", H2_CM_DB);
 
-        Present_HOST=getStringConfigurationValue(confName, bulkOperation, "presenter.host", Present_HOST);
+        Present_HOST = getStringConfigurationValue(confName, bulkOperation, "presenter.host", Present_HOST);
         PRESENTER = getIntConfigurationValue(confName, bulkOperation, "presenter.port", PRESENTER);
-        PROTOCOL=getStringConfigurationValue(confName, bulkOperation, "presenter.protocol", PROTOCOL);
+        PROTOCOL = getStringConfigurationValue(confName, bulkOperation, "presenter.protocol", PROTOCOL);
 
-        String sTRUSTSTORE_FILE=OSSM_HOME+TRUSTSTORE_FILE;
+        String sTRUSTSTORE_FILE = OSSM_HOME + TRUSTSTORE_FILE;
         try {
             String s1 = bulkOperation.getString("SSL.TRUSTSTORE_FILE");
             if (!sTRUSTSTORE_FILE.equals(s1)) {
-                TRUSTSTORE_FILE=s1;
+                TRUSTSTORE_FILE = s1;
                 isGlobalChanged = true;
-            }else{
-                TRUSTSTORE_FILE="${OSSM_HOME}\""+TRUSTSTORE_FILE+"\"";
+            } else {
+                TRUSTSTORE_FILE = "${OSSM_HOME}\"" + TRUSTSTORE_FILE + "\"";
             }
         } catch (Exception e) {
-            TRUSTSTORE_FILE="${OSSM_HOME}\""+TRUSTSTORE_FILE+"\"";
+            TRUSTSTORE_FILE = "${OSSM_HOME}\"" + TRUSTSTORE_FILE + "\"";
             System.out.println("[Warning] Failed to get configuration SSL.TRUSTSTORE_FILE from bulk_operation.\n" + e.getMessage());
         }
-        TRUSTSTORE_TYPE=getStringConfigurationValue(confName, bulkOperation, "SSL.TRUSTSTORE_TYPE", TRUSTSTORE_TYPE);
-        TRUSTSTORE_PASS=getStringConfigurationValue(confName, bulkOperation, "SSL.TRUSTSTORE_PASS", TRUSTSTORE_PASS);
+        TRUSTSTORE_TYPE = getStringConfigurationValue(confName, bulkOperation, "SSL.TRUSTSTORE_TYPE", TRUSTSTORE_TYPE);
+        TRUSTSTORE_PASS = getStringConfigurationValue(confName, bulkOperation, "SSL.TRUSTSTORE_PASS", TRUSTSTORE_PASS);
 
         if (isHA) {  //get remote bulk_op port
             try {
@@ -461,42 +461,42 @@ public class MigrationV256 {
         try {
             List ha = uoc2config.getObjectList("uocv2");
             Config cf = ((ConfigObject) ha.toArray()[0]).toConfig();
-            UOC_HOST=getStringConfigurationValue(confName, cf, "host", UOC_HOST);
-            UOC_HTTP= getIntConfigurationValue(confName, cf, "port", UOC_HTTP);
-            UOC_PROTOCOL=getStringConfigurationValue(confName, cf, "protocol", UOC_PROTOCOL);
-            if(isHA){  //it require the remote host is the second one
+            UOC_HOST = getStringConfigurationValue(confName, cf, "host", UOC_HOST);
+            UOC_HTTP = getIntConfigurationValue(confName, cf, "port", UOC_HTTP);
+            UOC_PROTOCOL = getStringConfigurationValue(confName, cf, "protocol", UOC_PROTOCOL);
+            if (isHA) {  //it require the remote host is the second one
                 cf = ((ConfigObject) ha.toArray()[1]).toConfig();
-                HA_UOC_HOST=getStringConfigurationValue(confName, cf, "host", HA_UOC_HOST);
-                HA_UOC_HTTP= getIntConfigurationValue(confName, cf, "port", HA_UOC_HTTP);
-                HA_UOC_PROTOCOL=getStringConfigurationValue(confName, cf, "protocol", HA_UOC_PROTOCOL);
+                HA_UOC_HOST = getStringConfigurationValue(confName, cf, "host", HA_UOC_HOST);
+                HA_UOC_HTTP = getIntConfigurationValue(confName, cf, "port", HA_UOC_HTTP);
+                HA_UOC_PROTOCOL = getStringConfigurationValue(confName, cf, "protocol", HA_UOC_PROTOCOL);
             }
         } catch (Exception e) {
             System.out.println("[ERROR] Failed to parse configurations in  uoc2config.conf. Please check it.");
         }
 
-        try{
-            boolean isSSL=uoc2config.getBoolean("SSL.strictSSL");
-            if(isSSL!=UOC_strictSSL){
-                UOC_strictSSL=isSSL;
-                isGlobalChanged=true;
+        try {
+            boolean isSSL = uoc2config.getBoolean("SSL.strictSSL");
+            if (isSSL != UOC_strictSSL) {
+                UOC_strictSSL = isSSL;
+                isGlobalChanged = true;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("[Warning] Failed to get SSL.strictSSL from uoc2config");
         }
-        UOC_trustStoreFile=getStringConfigurationValue(confName,uoc2config,"SSL.trustStoreFile",UOC_trustStoreFile);
-        UOC_trustStorePass=getStringConfigurationValue(confName,uoc2config,"SSL.trustStorePass",UOC_trustStorePass);
-        UOC_trustStoreType=getStringConfigurationValue(confName,uoc2config,"SSL.trustStoreType",UOC_trustStoreType);
+        UOC_trustStoreFile = getStringConfigurationValue(confName, uoc2config, "SSL.trustStoreFile", UOC_trustStoreFile);
+        UOC_trustStorePass = getStringConfigurationValue(confName, uoc2config, "SSL.trustStorePass", UOC_trustStorePass);
+        UOC_trustStoreType = getStringConfigurationValue(confName, uoc2config, "SSL.trustStoreType", UOC_trustStoreType);
 
         //wsrestservice
         confName = "wsrestservice";
         final Config wsrestservice = ConfigFactory.load(confName + ext);
         pickupAkkaPort(wsrestservice, "AKKA_REST_SERVICE", confName);
-        HTTP_PORT= getIntConfigurationValue(confName, wsrestservice, "configurations.port", HTTP_PORT);
+        HTTP_PORT = getIntConfigurationValue(confName, wsrestservice, "configurations.port", HTTP_PORT);
 
         //umbadapter
         confName = "umbadapter";
         final Config umbadapter = ConfigFactory.parseFile(new File(OSSM_DATA + "/adapters/umb_temip/conf/umbadapter_v256.conf"));
-        AKKA_UMBADAPTER= getIntConfigurationValue(confName, umbadapter, "PORTS.REMOTE_UMBADAPTER", AKKA_UMBADAPTER);
+        AKKA_UMBADAPTER = getIntConfigurationValue(confName, umbadapter, "PORTS.REMOTE_UMBADAPTER", AKKA_UMBADAPTER);
     }
 
     private static boolean renameFile(String fileName, boolean revert) {
