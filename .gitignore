@@ -16,11 +16,4 @@ assemble/
 .cache-main
 .cache-tests
 .idea/
-java/presenter/OSSM_DATA_IS_UNDEFINED/logs/REST.log
-java/presenter/OSSM_DATA_IS_UNDEFINED/logs/PRESENTER.log
-java/presenter/OSSM_DATA_IS_UNDEFINED/logs/USER_OPERATION.log
-java/presenter/OSSM_DATA_IS_UNDEFINED/logs/PRESENTER-2018-04-19-0.log.gz
-java/presenter/OSSM_DATA_IS_UNDEFINED/logs/PRESENTER*.log.gz
-assembly/server/src/main/resources/packages/csv-demo/ossm-server/transformation
-/installer/src/main/resources/ossm-server/uoc-server-package-2.5.tar
 *.rety
