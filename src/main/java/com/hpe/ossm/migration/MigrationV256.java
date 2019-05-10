@@ -17,6 +17,10 @@ public class MigrationV256 {
     private static String TRUSTSTORE_FILE ="/ssl/exampletrust.jks";
     private static String TRUSTSTORE_TYPE = "JKS";
     private static String TRUSTSTORE_PASS = "ossmtest";
+    private static boolean UOC_strictSSL=false;
+    private static String UOC_trustStoreFile ="";
+    private static String UOC_trustStorePass = "";
+    private static String UOC_trustStoreType = "";
     private static String HOST_LOCAL = "localhost";
     private static String Present_HOST = "localost";
     private static String HOST_HA = "";
@@ -172,6 +176,13 @@ public class MigrationV256 {
             fileWritter.write("\n");
 
             //SSL_UOC
+            fileWritter.write("SSL_UOC={\n");
+            fileWritter.write("\tstrictSSL=" + UOC_strictSSL + "\n");
+            fileWritter.write("\ttrustStoreFile=\"" + UOC_trustStoreFile + "\"\n");
+            fileWritter.write("\ttrustStorePass=\"" + UOC_trustStorePass + "\"\n");
+            fileWritter.write("\ttrustStorePass=\"" + UOC_trustStoreType + "\"\n");
+            fileWritter.write("}\n");
+            fileWritter.write("\n");
 
             if (isHA) {
                 fileWritter.write("HOST_HA_REMOTE={\n");
@@ -462,6 +473,19 @@ public class MigrationV256 {
         } catch (Exception e) {
             System.out.println("[ERROR] Failed to parse configurations in  uoc2config.conf. Please check it.");
         }
+
+        try{
+            boolean isSSL=uoc2config.getBoolean("SSL.strictSSL");
+            if(isSSL!=UOC_strictSSL){
+                UOC_strictSSL=isSSL;
+                isGlobalChanged=true;
+            }
+        }catch(Exception e){
+            System.out.println("[Warning] Failed to get SSL.strictSSL from uoc2config");
+        }
+        UOC_trustStoreFile=getStringConfigurationValue(confName,uoc2config,"SSL.trustStoreFile",UOC_trustStoreFile);
+        UOC_trustStorePass=getStringConfigurationValue(confName,uoc2config,"SSL.trustStorePass",UOC_trustStorePass);
+        UOC_trustStoreType=getStringConfigurationValue(confName,uoc2config,"SSL.trustStoreType",UOC_trustStoreType);
 
         //wsrestservice
         confName = "wsrestservice";
