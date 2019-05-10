@@ -13,12 +13,12 @@ import java.util.List;
 public class MigrationV256 {
     private static boolean isGlobalChanged = false;
     public static boolean isHA = false;  //public for UT
-    private static boolean isHTTPs=false;
-    private static String TRUSTSTORE_FILE = "${OSSM_HOME}\"/ssl/exampletrust.jks\"";
+    private static String PROTOCOL = "http";
+    private static String TRUSTSTORE_FILE ="/ssl/exampletrust.jks";
     private static String TRUSTSTORE_TYPE = "JKS";
     private static String TRUSTSTORE_PASS = "ossmtest";
     private static String HOST_LOCAL = "localhost";
-    private static String Present_HOST="localost";
+    private static String Present_HOST = "localost";
     private static String HOST_HA = "";
     private static int AKKA_SELF_MONITOR = 3713;
     private static int AKKA_REST_SERVICE = 4741;
@@ -36,16 +36,19 @@ public class MigrationV256 {
     private static int DC_TCP = 9292;
     private static int H2_CM_DB = 9192;
     private static int UOC_HTTP = 3000;
-
+    private static String UOC_PROTOCOL="http";
+    private static String UOC_HOST="localhost";
     private static int HA_AKKA_CM = 5556;
     private static int HA_UOC_HTTP = 3000;
+    private static String HA_UOC_HOST="";
+    private static String HA_UOC_PROTOCOL="http";
     private static int HA_AKKA_BULK_OP = 5557;
 
     private static final String pathAKKAHost = "akka.remote.netty.tcp.hostname";
     private static final String pathAKKAPort = "akka.remote.netty.tcp.port";
 
     private static final String[] fileListConf = {"selfmonitor", "wsrestservice", "cmglobal", "dcglobal", "selfmonitor_presenter",
-            "sink", "receiverglobal", "receiverservice", "receiverconsole", "bulk_operation","uoc2config"};
+            "sink", "receiverglobal", "receiverservice", "receiverconsole", "bulk_operation", "uoc2config"};
     private static final String[] fileListAdapter = {"/umb_temip/conf/umbadapter"};
 
     public static String OSSM_DATA = System.getenv("OSSM_DATA");
@@ -70,7 +73,7 @@ public class MigrationV256 {
     private static void compareConfFile(String sNew, String sOld) {
         System.out.println("*************************************************************************************");
         System.out.println("Updates of " + sOld + ".conf");
-        try{
+        try {
             final Config cNew = ConfigFactory.load(sNew);
             final Config cOld = ConfigFactory.load(sOld);
             cNew.entrySet().forEach(e -> {
@@ -95,55 +98,94 @@ public class MigrationV256 {
                 }
             });
             System.out.println("*************************************************************************************");
-        }catch(Exception ex){
+        } catch (Exception ex) {
             System.out.println("Error in compareConfFile:" + ex.getMessage());
         }
 
     }
 
-    private static void saveHostAndPort(String OSSM_DATA){  //TODO
-        try{
-            File fOutput= new File(OSSM_DATA + "/conf/host_and_port.conf");
+    private static void saveHostAndPort(String OSSM_DATA) {
+        try {
+            File fOutput = new File(OSSM_DATA + "/conf/host_and_port.conf");
             if (!fOutput.exists()) {
-                boolean r=fOutput.createNewFile();
-                if(!r){
+                boolean r = fOutput.createNewFile();
+                if (!r) {
                     System.out.println("Error: Failed to create file.");
                 }
             }
             FileWriter fileWritter = new FileWriter(fOutput, false);
+
+            //HOST_LOCAL
             fileWritter.write("HOST_LOCAL={\n");
-            fileWritter.write("\tHOST=\""+HOST_LOCAL+"\"\n");
-            fileWritter.write("\tPORTS {\n");
-            fileWritter.write("\t\tAKKA_SELF_MONITOR="+AKKA_SELF_MONITOR+"\n");
-            fileWritter.write("\t\tAKKA_REST_SERVICE="+AKKA_REST_SERVICE+"\n");
-            fileWritter.write("\t\tAKKA_UMBADAPTER="+AKKA_UMBADAPTER+"\n");
-            fileWritter.write("\t\tAKKA_CM="+AKKA_CM+"\n");
-            fileWritter.write("\t\tAKKA_DC_ADAPTER="+AKKA_DC_ADAPTER+"\n");
-            fileWritter.write("\t\tAKKA_PRESENTER="+AKKA_PRESENTER+"\n");
-            fileWritter.write("\t\tAKKA_SINK="+AKKA_SINK+"\n");
-            fileWritter.write("\t\tAKKA_RECEIVER="+AKKA_RECEIVER+"\n");
-            fileWritter.write("\t\tAKKA_RECEIVER_CONSOLE="+AKKA_RECEIVER_CONSOLE+"\n");
-            fileWritter.write("\t\tAKKA_BULK_OP="+AKKA_BULK_OP+"\n");
-            fileWritter.write("\t\tHTTP_PORT="+HTTP_PORT+"\n");
-            fileWritter.write("\t\tPRESENTER="+PRESENTER+"\n");
-            fileWritter.write("\t\tH2_DB="+H2_DB+"\n");
-            fileWritter.write("\t\tDC_TCP="+DC_TCP+"\n");
-            fileWritter.write("\t\tH2_CM_DB="+H2_CM_DB+"\n");
-            fileWritter.write("\t\tUOC_HTTP="+UOC_HTTP+"\n");
+            fileWritter.write("\tHOST=\"" + HOST_LOCAL + "\"\n");
+            fileWritter.write("\tPORTS={\n");
+            fileWritter.write("\t\tAKKA_SELF_MONITOR=" + AKKA_SELF_MONITOR + "\n");
+            fileWritter.write("\t\tAKKA_REST_SERVICE=" + AKKA_REST_SERVICE + "\n");
+            fileWritter.write("\t\tAKKA_UMBADAPTER=" + AKKA_UMBADAPTER + "\n");
+            fileWritter.write("\t\tAKKA_CM=" + AKKA_CM + "\n");
+            fileWritter.write("\t\tAKKA_DC_ADAPTER=" + AKKA_DC_ADAPTER + "\n");
+            fileWritter.write("\t\tAKKA_PRESENTER=" + AKKA_PRESENTER + "\n");
+            fileWritter.write("\t\tAKKA_SINK=" + AKKA_SINK + "\n");
+            fileWritter.write("\t\tAKKA_RECEIVER=" + AKKA_RECEIVER + "\n");
+            fileWritter.write("\t\tAKKA_RECEIVER_CONSOLE=" + AKKA_RECEIVER_CONSOLE + "\n");
+            fileWritter.write("\t\tAKKA_BULK_OP=" + AKKA_BULK_OP + "\n");
+            fileWritter.write("\t\tHTTP_PORT=" + HTTP_PORT + "\n");
+            fileWritter.write("\t\tPRESENTER=" + PRESENTER + "\n");
+            fileWritter.write("\t\tH2_DB=" + H2_DB + "\n");
+            fileWritter.write("\t\tDC_TCP=" + DC_TCP + "\n");
+            fileWritter.write("\t\tH2_CM_DB=" + H2_CM_DB + "\n");
+            fileWritter.write("\t\tUOC_HTTP=" + UOC_HTTP + "\n");
             fileWritter.write("\t}\n");
             fileWritter.write("}\n");
             fileWritter.write("\n");
-            fileWritter.write("HOST_HA_REMOTE={\n");
-            fileWritter.write("\tHOST=\""+HOST_HA+"\"\n");
-            fileWritter.write("\tPORTS {\n");
-            fileWritter.write("\t\tAKKA_CM="+HA_AKKA_CM+"\n");
-            fileWritter.write("\t\tUOC_HTTP="+HA_UOC_HTTP+"\n");
-            fileWritter.write("\t\tAKKA_BULK_OP="+HA_AKKA_BULK_OP+"\n");
-            fileWritter.write("\t}\n");
+
+            //HOST_PRESENTER
+            fileWritter.write("HOST_PRESENTER={\n");
+            if(Present_HOST.equals(HOST_LOCAL)){
+                fileWritter.write("\tHOST=${HOST_LOCAL.HOST}\n");
+            }else{
+                fileWritter.write("\tHOST=\"" + Present_HOST + "\"\n");
+            }
+            fileWritter.write("\tPROTOCOL=\"" + PROTOCOL + "\"\n");
+            fileWritter.write("\tPORT=${HOST_LOCAL.PORTS.PRESENTER}\n");
             fileWritter.write("}\n");
             fileWritter.write("\n");
-            fileWritter.write("HA={\n");
-            if(isHA){
+
+            //SSL
+            fileWritter.write("SSL={\n");
+            fileWritter.write("\tTRUSTSTORE_FILE=" + TRUSTSTORE_FILE + "\n");
+            fileWritter.write("\tTRUSTSTORE_TYPE=\"" + TRUSTSTORE_TYPE + "\"\n");
+            fileWritter.write("\tTRUSTSTORE_PASS=\"" + TRUSTSTORE_PASS + "\"\n");
+            fileWritter.write("}\n");
+            fileWritter.write("\n");
+
+            //HOST_UOC
+            fileWritter.write("HOST_UOC={\n");
+            fileWritter.write("\tprotocol=\"" + UOC_PROTOCOL + "\"\n");
+            if(UOC_HOST.equals(HOST_LOCAL)){
+                fileWritter.write("\thost=${HOST_LOCAL.HOST}\n");
+            }else{
+                fileWritter.write("\thost=\"" + UOC_HOST + "\"\n");
+            }
+            fileWritter.write("\tport=${HOST_LOCAL.PORTS.UOC_HTTP}\n");
+            fileWritter.write("}\n");
+            fileWritter.write("\n");
+
+            //SSL_UOC
+
+            if (isHA) {
+                fileWritter.write("HOST_HA_REMOTE={\n");
+                fileWritter.write("\tHOST=\"" + HOST_HA + "\"\n");
+                fileWritter.write("\tPORTS {\n");
+                fileWritter.write("\t\tAKKA_CM=" + HA_AKKA_CM + "\n");
+                fileWritter.write("\t\tUOC_HTTP=" + HA_UOC_HTTP + "\n");
+                fileWritter.write("\t\tAKKA_BULK_OP=" + HA_AKKA_BULK_OP + "\n");
+                fileWritter.write("\t}\n");
+                fileWritter.write("}\n");
+                fileWritter.write("\n");
+                fileWritter.write("HA={\n");
+
+
                 fileWritter.write("  cmHA {\n" +
                         "       host = ${HOST_HA_REMOTE.HOST} //use the same hostname configured in the cmglobal.conf of the other server\n" +
                         "       port = ${HOST_HA_REMOTE.PORTS.AKKA_CM}\n" +
@@ -159,29 +201,11 @@ public class MigrationV256 {
                         "    host = ${HOST_HA_REMOTE.HOST}\n" +
                         "    port = ${HOST_HA_REMOTE.PORTS.UOC_HTTP}\n" +
                         "  }");
-            }else{
-                fileWritter.write("#  cmHA {\n" +
-                        "  #     host = ${HOST_HA_REMOTE.HOST} //use the same hostname configured in the cmglobal.conf of the other server\n" +
-                        "  #     port = ${HOST_HA_REMOTE.PORTS.AKKA_CM}\n" +
-                        "  #   }\n" +
-                        "\n" +
-                        "  #  bulkHA {\n" +
-                        "  #     host = ${HOST_HA_REMOTE.HOST} //use the same hostname configured in the cmglobal.conf of the other server\n" +
-                        "  #     port = ${HOST_HA_REMOTE.PORTS.AKKA_BULK_OP}\n" +
-                        "  #   }\n" +
-                        "\n" +
-                        "  #UOC_REMOTE{\n" +
-                        "  #  protocol = \"http\"\n" +
-                        "  #  host = ${HOST_HA_REMOTE.HOST}\n" +
-                        "  #  port = ${HOST_HA_REMOTE.PORTS.UOC_HTTP}\n" +
-                        "  #}");
-
             }
-            fileWritter.write("}\n");
             fileWritter.flush();
             fileWritter.close();
-        }catch(Exception e){
-            System.out.println("Failed to create host_and_port.conf, "+e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Failed to create host_and_port.conf, " + e.getMessage());
         }
     }
 
@@ -193,13 +217,13 @@ public class MigrationV256 {
             File fd = new File(OSSM_DATA + "/adapters" + f + "_v256.conf");
 
             if (fs.exists() && fd.exists()) {
-                if (!deleteFile( "/adapters" + f)) {
+                if (!deleteFile("/adapters" + f)) {
                     System.exit(-1);
                 }
-                if (!renameFile( "/adapters" + f, true)) {
+                if (!renameFile("/adapters" + f, true)) {
                     System.exit(-1);
                 }
-                if (!deleteFile( "/adapters" + f + ext)) {
+                if (!deleteFile("/adapters" + f + ext)) {
                     System.exit(-1);
                 }
             }
@@ -210,13 +234,13 @@ public class MigrationV256 {
 
 //            System.out.println("ppppp "+fs.getAbsolutePath());
             if (fs.exists() && fd.exists()) {
-                if (!deleteFile( "/conf/" + f)) {
+                if (!deleteFile("/conf/" + f)) {
                     System.exit(-1);
                 }
-                if (!renameFile( "/conf/" + f, true)) {
+                if (!renameFile("/conf/" + f, true)) {
                     System.exit(-1);
                 }
-                if (!deleteFile( "/conf/" + f + ext)) {
+                if (!deleteFile("/conf/" + f + ext)) {
                     System.exit(-1);
                 }
             }
@@ -225,12 +249,12 @@ public class MigrationV256 {
 //        if (!deleteFile(OSSM_DATA, "/conf/host_and_port.conf")) {
 //            System.exit(-1);
 //        }
-        if (!deleteFile( "/conf/ossm_akka_global.conf")) {
+        if (!deleteFile("/conf/ossm_akka_global.conf")) {
 //            System.exit(-1);
         }
     }
 
-    private static void pickupAkkaPort(Config c, String s, String confName)  {
+    private static void pickupAkkaPort(Config c, String s, String confName) {
         try {
             int port = c.getInt(pathAKKAPort);
             switch (s) {
@@ -299,45 +323,48 @@ public class MigrationV256 {
         }
     }
 
-    public static void pickupConfigurations() throws ConfigException{
+    private static String getStringConfigurationValue(String fileName, Config c, String p, String s) {
+        try {
+            String s1 = c.getString(p);
+            if (!s.equals(s1)) {
+                isGlobalChanged = true;
+            }
+            return s1;
+        } catch (Exception e) {
+            System.out.println("[Warning] Failed to get configuration " + p + " from  " + fileName + ".\n" + e.getMessage());
+            return s;
+        }
+    }
+
+    private static int getIntConfigurationValue(String fileName, Config c, String p, int s) {
+        try {
+            int s1 = c.getInt(p);
+            if (s != s1) {
+                isGlobalChanged = true;
+            }
+            return s1;
+        } catch (Exception e) {
+            System.out.println("[Warning] Failed to get configuration " + p + " from  " + fileName + ".\n" + e.getMessage());
+            return s;
+        }
+    }
+
+    public static void pickupConfigurations() throws ConfigException {
         final String ext = "_v256";
         //dcglobal
         String confName = "dcglobal";
         final Config dcglobal = ConfigFactory.load(confName + ext);
-        try {
-            String host = dcglobal.getString(pathAKKAHost);
-            int port = dcglobal.getInt(pathAKKAPort);
-            int port2 = dcglobal.getInt("dc.tcpPort");
-            if (!host.equals(HOST_LOCAL)) {
-                HOST_LOCAL = host;
-                isGlobalChanged = true;
-            }
-            if (port != AKKA_DC_ADAPTER) {
-                AKKA_DC_ADAPTER = port;
-                isGlobalChanged = true;
-            }
-            if (port2 != DC_TCP) {
-                DC_TCP = port2;
-                isGlobalChanged = true;
-            }
+        HOST_LOCAL = getStringConfigurationValue(confName, dcglobal, pathAKKAHost, HOST_LOCAL);
+        AKKA_DC_ADAPTER = getIntConfigurationValue(confName, dcglobal, pathAKKAPort, AKKA_DC_ADAPTER);
+        DC_TCP = getIntConfigurationValue(confName, dcglobal, "dc.tcpPort", DC_TCP);
 
-        } catch (Exception e) {
-            System.out.println("Failed to get current configurations from " + confName + ". " + e.getMessage());
-            System.exit(-1);
-        }
         try {
             List ha = dcglobal.getObjectList("dc.clusteredCM");
             Config cf = ((ConfigObject) ha.toArray()[0]).toConfig();
-            String host = cf.getString("host");
-            int port = cf.getInt("port");
-            if (!host.equals(HOST_HA)) {
-                HOST_HA = host;
-                isGlobalChanged = true;
-            }
-            if (port != HA_AKKA_CM) {
-                HA_AKKA_CM = port;
-                isGlobalChanged = true;
-            }
+
+            HOST_HA = getStringConfigurationValue(confName, cf, "host", HOST_HA);
+            HA_AKKA_CM = getIntConfigurationValue(confName, cf, "port", HA_AKKA_CM);
+
             isHA = true;
             System.out.println("In HA environment.");
         } catch (Exception e) {
@@ -349,86 +376,36 @@ public class MigrationV256 {
         final Config bulkOperation = ConfigFactory.load(confName + ext);
 //        System.out.println("xxxx="+bulkOperation.getString("slick-h2.db.properties.url"));
         pickupAkkaPort(bulkOperation, "AKKA_BULK_OP", confName);
+        H2_CM_DB=getIntConfigurationValue(confName, bulkOperation, "PORTS.H2_CM_DB", H2_CM_DB);
+
+        Present_HOST=getStringConfigurationValue(confName, bulkOperation, "presenter.host", Present_HOST);
+        PRESENTER = getIntConfigurationValue(confName, bulkOperation, "presenter.port", PRESENTER);
+        PROTOCOL=getStringConfigurationValue(confName, bulkOperation, "presenter.protocol", PROTOCOL);
+
+        String sTRUSTSTORE_FILE=OSSM_HOME+TRUSTSTORE_FILE;
         try {
-            int port = bulkOperation.getInt("PORTS.H2_CM_DB");
-            if (port != H2_CM_DB) {
-                H2_CM_DB = port;
+            String s1 = bulkOperation.getString("SSL.TRUSTSTORE_FILE");
+            if (!sTRUSTSTORE_FILE.equals(s1)) {
+                TRUSTSTORE_FILE=s1;
                 isGlobalChanged = true;
+            }else{
+                TRUSTSTORE_FILE="${OSSM_HOME}\""+TRUSTSTORE_FILE+"\"";
             }
         } catch (Exception e) {
-
+            TRUSTSTORE_FILE="${OSSM_HOME}\""+TRUSTSTORE_FILE+"\"";
+            System.out.println("[Warning] Failed to get configuration SSL.TRUSTSTORE_FILE from bulk_operation.\n" + e.getMessage());
         }
+        TRUSTSTORE_TYPE=getStringConfigurationValue(confName, bulkOperation, "SSL.TRUSTSTORE_TYPE", TRUSTSTORE_TYPE);
+        TRUSTSTORE_PASS=getStringConfigurationValue(confName, bulkOperation, "SSL.TRUSTSTORE_PASS", TRUSTSTORE_PASS);
 
-        try{
-            String pHost=bulkOperation.getString("PRESENTER_HOST");
-            if(!Present_HOST.equalsIgnoreCase(pHost)){
-                Present_HOST=pHost;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
-        try{
-            String protocol=bulkOperation.getString("PRESENTER_PROTOCOL");
-            if("https".equalsIgnoreCase(protocol)){
-                isHTTPs=true;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
-        try{
-            String sslFile=bulkOperation.getString("SSL.TRUSTSTORE_FILE");
-            if(!TRUSTSTORE_FILE.equals(sslFile)){
-                TRUSTSTORE_FILE=sslFile;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
-        try{
-            String sslType=bulkOperation.getString("SSL.TRUSTSTORE_TYPE");
-            if(!TRUSTSTORE_TYPE.equals(sslType)){
-                TRUSTSTORE_TYPE=sslType;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
-        try{
-            String sslPass=bulkOperation.getString("SSL.TRUSTSTORE_PASS");
-            if(!TRUSTSTORE_PASS.equals(sslPass)){
-                TRUSTSTORE_PASS=sslPass;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
-        try{
-            int port = bulkOperation.getInt("presenter.port");
-            if (port != PRESENTER) {
-                PRESENTER = port;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
         if (isHA) {  //get remote bulk_op port
             try {
                 List ha = bulkOperation.getObjectList("ossm_cluster.otherBulkOpAdapters");  //TODO: test
                 Config cf = ((ConfigObject) ha.toArray()[0]).toConfig();
-                int port = cf.getInt("port");
-                if (port != HA_AKKA_BULK_OP) {
-                    HA_AKKA_BULK_OP = port;
-                    isGlobalChanged = true;
-                }
+                //assume the host is same as that get from dcglobla.conf
+                HA_AKKA_BULK_OP = getIntConfigurationValue(confName, cf, "port", HA_AKKA_BULK_OP);
             } catch (Exception e) {
-                //the current HA setting is wrong, use default values.
+                System.out.println("[ERROR] Failed to get 'ossm_cluster' settings from bulk_operation.conf. Please check if the HA configuration is correct.");
             }
         }
 
@@ -445,16 +422,7 @@ public class MigrationV256 {
         //receiverglobal
         confName = "receiverglobal";
         final Config receiverglobal = ConfigFactory.load(confName + ext);
-        try {
-            int port = receiverglobal.getInt("receiver.ServerPort");
-            if (port != H2_DB) {
-                H2_DB = port;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
+        H2_DB = getIntConfigurationValue(confName, receiverglobal, "receiver.ServerPort", H2_DB);
 
         //receiverservice
         confName = "receiverservice";
@@ -477,53 +445,34 @@ public class MigrationV256 {
         pickupAkkaPort(sink, "AKKA_SINK", confName);
 
         //uoc2config
-        confName = "uoc2config";    //TODO
+        confName = "uoc2config";
         final Config uoc2config = ConfigFactory.load(confName + ext);
         try {
             List ha = uoc2config.getObjectList("uocv2");
             Config cf = ((ConfigObject) ha.toArray()[0]).toConfig();
-            int port = cf.getInt("port");
-            if (port != UOC_HTTP) {
-                UOC_HTTP = port;
-                isGlobalChanged = true;
-            }
-            cf = ((ConfigObject) ha.toArray()[1]).toConfig();
-            port = cf.getInt("port");
-            if (port != HA_UOC_HTTP) {
-                HA_UOC_HTTP = port;
-                isGlobalChanged = true;
+            UOC_HOST=getStringConfigurationValue(confName, cf, "host", UOC_HOST);
+            UOC_HTTP= getIntConfigurationValue(confName, cf, "port", UOC_HTTP);
+            UOC_PROTOCOL=getStringConfigurationValue(confName, cf, "protocol", UOC_PROTOCOL);
+            if(isHA){  //it require the remote host is the second one
+                cf = ((ConfigObject) ha.toArray()[1]).toConfig();
+                HA_UOC_HOST=getStringConfigurationValue(confName, cf, "host", HA_UOC_HOST);
+                HA_UOC_HTTP= getIntConfigurationValue(confName, cf, "port", HA_UOC_HTTP);
+                HA_UOC_PROTOCOL=getStringConfigurationValue(confName, cf, "protocol", HA_UOC_PROTOCOL);
             }
         } catch (Exception e) {
-
+            System.out.println("[ERROR] Failed to parse configurations in  uoc2config.conf. Please check it.");
         }
 
         //wsrestservice
         confName = "wsrestservice";
         final Config wsrestservice = ConfigFactory.load(confName + ext);
         pickupAkkaPort(wsrestservice, "AKKA_REST_SERVICE", confName);
-        try {
-            int port = receiverglobal.getInt("configurations.port");
-            if (port != HTTP_PORT) {
-                HTTP_PORT = port;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
+        HTTP_PORT= getIntConfigurationValue(confName, wsrestservice, "configurations.port", HTTP_PORT);
 
         //umbadapter
         confName = "umbadapter";
         final Config umbadapter = ConfigFactory.parseFile(new File(OSSM_DATA + "/adapters/umb_temip/conf/umbadapter_v256.conf"));
-        try {
-            int port = umbadapter.getInt("PORTS.REMOTE_UMBADAPTER");
-            if (port != AKKA_UMBADAPTER) {
-                AKKA_UMBADAPTER = port;
-                isGlobalChanged = true;
-            }
-        } catch (Exception e) {
-
-        }
-
+        AKKA_UMBADAPTER= getIntConfigurationValue(confName, umbadapter, "PORTS.REMOTE_UMBADAPTER", AKKA_UMBADAPTER);
     }
 
     private static boolean renameFile(String fileName, boolean revert) {
@@ -552,7 +501,7 @@ public class MigrationV256 {
 
     }
 
-    private static boolean deleteFile( String fileName) {
+    private static boolean deleteFile(String fileName) {
         File file = new File(OSSM_DATA + fileName + ".conf");
         if (!file.exists()) {
             return true;
@@ -564,7 +513,7 @@ public class MigrationV256 {
         return true;
     }
 
-    private static boolean copyFile( String fileName) {
+    private static boolean copyFile(String fileName) {
         try {
             FileInputStream input = new FileInputStream(OSSM_HOME + fileName + ".conf");
             FileOutputStream output = new FileOutputStream(OSSM_DATA + fileName + ".conf");
@@ -583,7 +532,7 @@ public class MigrationV256 {
     }
 
     public static void main(String[] args) {
-        if(args.length==0){  //migrate all conf files
+        if (args.length == 0) {  //migrate all conf files
             System.out.println("Tools to migrate configuration files from v2.5.6 sp2 to v2.6 MR");
             if (null == OSSM_DATA) {  //check OSSM_DATA
                 System.out.println("Not found OSSM_DATA path, exit.");
@@ -596,15 +545,15 @@ public class MigrationV256 {
             System.out.println("Migration configuration files from " + OSSM_DATA + "/conf to " + OSSM_HOME + "/conf");
             revert();
             //new files
-            if (!copyFile( "/conf/ossm_akka_global")) {
+            if (!copyFile("/conf/ossm_akka_global")) {
                 System.exit(-1);
             }
             //rename v256 files
             for (String f : fileListAdapter) {
-                if (!renameFile( "/adapters" + f, false)) {
+                if (!renameFile("/adapters" + f, false)) {
                     System.exit(-1);
                 }
-                if (!copyFile( "/adapters" + f)) {
+                if (!copyFile("/adapters" + f)) {
                     System.exit(-1);
                 }
             }
@@ -612,15 +561,15 @@ public class MigrationV256 {
                 if (!renameFile("/conf/" + f, false)) {
                     System.exit(-1);
                 }
-                if (!copyFile( "/conf/" + f)) {
+                if (!copyFile("/conf/" + f)) {
                     System.exit(-1);
                 }
             }
 
             //pick up current configurations
-            try{
+            try {
                 pickupConfigurations();
-            }catch(ConfigException e){
+            } catch (ConfigException e) {
                 System.out.println("Failed to load conf files, please check the classpath. " + e.getMessage());
                 System.exit(-1);
             }
@@ -637,24 +586,24 @@ public class MigrationV256 {
             System.out.println("Migrate complete. Please use -c [file] to show the update configurations");
         }
 
-        if(args.length>0 && args[0].equals("-c")){  //show removed and updated configuration files
-            if(args.length==1){
+        if (args.length > 0 && args[0].equals("-c")) {  //show removed and updated configuration files
+            if (args.length == 1) {
                 for (String f : fileListConf) {
-                    compareConfFile(f,f+"_v256");
+                    compareConfFile(f, f + "_v256");
                 }
-            }else{
-                compareConfFile(args[1],args[1]+"_v256");
+            } else {
+                compareConfFile(args[1], args[1] + "_v256");
             }
         }
 
-        if(args.length>0 && args[0].equals("-h")) {  //show helps
+        if (args.length > 0 && args[0].equals("-h")) {  //show helps
             System.out.println("without parameters: to convert configuration files. New file are under in OSSM_DATA. Old files are renamed with _v256.");
             System.out.println("-r: to revert the convert");
             System.out.println("-c [file name]: show updated and removed configuration items. If not set 'file name' it will show changes in all configuration files.");
 //            System.out.println("-s OSSM_HOME OSSM_DATA: Update the ");
         }
 
-        if(args.length>0 && args[0].equals("-r")) {  //revert to 2.5.6
+        if (args.length > 0 && args[0].equals("-r")) {  //revert to 2.5.6
             System.out.println("Revert configuration files from v2.6 MR to v2.5.6 SP2");
             revert();
         }
