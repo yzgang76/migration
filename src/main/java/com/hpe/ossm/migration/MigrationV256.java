@@ -12,8 +12,13 @@ import java.util.List;
 @Getter
 public class MigrationV256 {
     private static boolean isGlobalChanged = false;
-    public static boolean isHA = false;
+    public static boolean isHA = false;  //public for UT
+    private static boolean isHTTPs=false;
+    private static String TRUSTSTORE_FILE = "${OSSM_HOME}\"/ssl/exampletrust.jks\"";
+    private static String TRUSTSTORE_TYPE = "JKS";
+    private static String TRUSTSTORE_PASS = "ossmtest";
     private static String HOST_LOCAL = "localhost";
+    private static String Present_HOST="localost";
     private static String HOST_HA = "";
     private static int AKKA_SELF_MONITOR = 3713;
     private static int AKKA_REST_SERVICE = 4741;
@@ -40,7 +45,7 @@ public class MigrationV256 {
     private static final String pathAKKAPort = "akka.remote.netty.tcp.port";
 
     private static final String[] fileListConf = {"selfmonitor", "wsrestservice", "cmglobal", "dcglobal", "selfmonitor_presenter",
-            "sink", "receiverglobal", "receiverservice", "receiverconsole", "bulk_operation"};
+            "sink", "receiverglobal", "receiverservice", "receiverconsole", "bulk_operation","uoc2config"};
     private static final String[] fileListAdapter = {"/umb_temip/conf/umbadapter"};
 
     public static String OSSM_DATA = System.getenv("OSSM_DATA");
@@ -96,7 +101,7 @@ public class MigrationV256 {
 
     }
 
-    private static void saveHostAndPort(String OSSM_DATA){
+    private static void saveHostAndPort(String OSSM_DATA){  //TODO
         try{
             File fOutput= new File(OSSM_DATA + "/conf/host_and_port.conf");
             if (!fOutput.exists()) {
@@ -350,8 +355,62 @@ public class MigrationV256 {
                 H2_CM_DB = port;
                 isGlobalChanged = true;
             }
+        } catch (Exception e) {
 
-            port = bulkOperation.getInt("presenter.port");
+        }
+
+        try{
+            String pHost=bulkOperation.getString("PRESENTER_HOST");
+            if(!Present_HOST.equalsIgnoreCase(pHost)){
+                Present_HOST=pHost;
+                isGlobalChanged = true;
+            }
+        } catch (Exception e) {
+
+        }
+
+        try{
+            String protocol=bulkOperation.getString("PRESENTER_PROTOCOL");
+            if("https".equalsIgnoreCase(protocol)){
+                isHTTPs=true;
+                isGlobalChanged = true;
+            }
+        } catch (Exception e) {
+
+        }
+
+        try{
+            String sslFile=bulkOperation.getString("SSL.TRUSTSTORE_FILE");
+            if(!TRUSTSTORE_FILE.equals(sslFile)){
+                TRUSTSTORE_FILE=sslFile;
+                isGlobalChanged = true;
+            }
+        } catch (Exception e) {
+
+        }
+
+        try{
+            String sslType=bulkOperation.getString("SSL.TRUSTSTORE_TYPE");
+            if(!TRUSTSTORE_TYPE.equals(sslType)){
+                TRUSTSTORE_TYPE=sslType;
+                isGlobalChanged = true;
+            }
+        } catch (Exception e) {
+
+        }
+
+        try{
+            String sslPass=bulkOperation.getString("SSL.TRUSTSTORE_PASS");
+            if(!TRUSTSTORE_PASS.equals(sslPass)){
+                TRUSTSTORE_PASS=sslPass;
+                isGlobalChanged = true;
+            }
+        } catch (Exception e) {
+
+        }
+
+        try{
+            int port = bulkOperation.getInt("presenter.port");
             if (port != PRESENTER) {
                 PRESENTER = port;
                 isGlobalChanged = true;
@@ -361,7 +420,7 @@ public class MigrationV256 {
         }
         if (isHA) {  //get remote bulk_op port
             try {
-                List ha = bulkOperation.getObjectList("otherBulkOpAdapters");
+                List ha = bulkOperation.getObjectList("ossm_cluster.otherBulkOpAdapters");  //TODO: test
                 Config cf = ((ConfigObject) ha.toArray()[0]).toConfig();
                 int port = cf.getInt("port");
                 if (port != HA_AKKA_BULK_OP) {
@@ -418,7 +477,7 @@ public class MigrationV256 {
         pickupAkkaPort(sink, "AKKA_SINK", confName);
 
         //uoc2config
-        confName = "uoc2config";
+        confName = "uoc2config";    //TODO
         final Config uoc2config = ConfigFactory.load(confName + ext);
         try {
             List ha = uoc2config.getObjectList("uocv2");
